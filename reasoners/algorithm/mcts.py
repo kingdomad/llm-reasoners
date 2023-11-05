@@ -196,6 +196,7 @@ class MCTS(SearchAlgorithm, Generic[State, Action, Example]):
         path = []
         while True:
             path.append(node)
+            # 如果到了叶子节点，则返回；否则选择ucb值最大的节点继续递归
             if node.children is None or len(node.children) == 0 or self._is_terminal_with_depth_limit(node):
                 return path
             node = self._uct_select(node)
@@ -204,6 +205,7 @@ class MCTS(SearchAlgorithm, Generic[State, Action, Example]):
         return node.Q + self.w_exp * np.sqrt(np.log(len(node.parent.cum_rewards)) / max(1, len(node.cum_rewards)))
 
     def _uct_select(self, node: MCTSNode) -> MCTSNode:
+        # 全部子节点都有state
         if self.uct_with_fast_reward or all(x.state is not None for x in node.children):
             return max(node.children, key=self._uct)
         else:
